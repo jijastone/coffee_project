@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Online Courses</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/course.css' %}"> -->
+</head>
+<body>
+
+
+
+<!-- Add your template there -->
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Online Course</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li>
+                <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
+                <a class="btn btn-link" href="{% url 'adminsite:logout' %}">Logout</a>
+            </li>
+            {% else %}
+            <li>
+                <form class="form-inline" action="{% url 'adminsite:login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Username" name="username" >
+                        <input type="password" class="form-control" placeholder="Password" name="psw" >
+                        <button class="btn btn-primary" type="submit">Login</button>
+                        <a class="btn btn-link" href="{% url 'adminsite:registration' %}">Sign Up</a>
+                    </div>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<h2>Popular courses list</h2>
+
+<!--Authentication section-->
+
+{% if course_list %}
+    <div class="container"> <!--Stylize root div with .container class -->
+        <div class="card-deck"> <!--Stylize the second div with .card-deck class -->
+            {% for course in course_list %}
+            <div class="card" style="width: 36rem;"> <!--Stylize third div with .card class -->
+                <img class="card-img-top" src="media/{{MEDIA_URL}}/{{ course.image }}" width="240px" height="240px"
+                           alt="Course image"> <!--Stylize card image with .card-img-left class -->
+                <div class="card-body bg-light"> <!--Stylize root div with .card-body and .bg-light class -->
+                    <h5 class="">{{ course.name }}, <span class="card-title text-success"> <!--Stylize h5 with .card-title and span with .text-success class -->
+                              {{ course.total_enrollment}} enrolled</span></h5>
+                    <p class="card-text">{{ course.description}}</p> <!--Stylize card description with .card-text class -->
+                    <form action="{% url 'adminsite:enroll' course.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Enroll"> <!--Stylize Enroll button with .btn and .btn-primary class -->
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>No courses are available.</p>
+{% endif %}
+
+</body>
+</html>
