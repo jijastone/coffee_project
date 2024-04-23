@@ -1,17 +1,21 @@
-
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Course
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic, View
-
 from django.contrib.auth import login, logout, authenticate
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 import logging
+
+from .models import Course
+from employees.models import UserProfile
 
 logger = logging.getLogger(__name__)
 
-
+def employee_list(request):
+    employees = UserProfile.objects.all()
+    return render(request, 'adminsite/employee_list.html', {'employees': employees})
 class CourseListView(generic.ListView):
     template_name = 'adminsite/course_list.html'
     context_object_name = 'course_list'
@@ -28,9 +32,17 @@ class EnrollView(View):
         return HttpResponseRedirect(reverse('adminsite:course_details', args=(course.id, )))
 
 
-class CourseDetailsView(generic.DetailView):
+class CourseDetailsView(ModelViewSet):
     model = Course
     template_name = 'adminsite/course_detail.html'
+
+class TestDetailsView(ModelViewSet):
+    @action(
+        detail=True,
+        methods=['get'],
+    )
+    def test(self, request, pk):
+        return None
 
 
 def logout_request(request):

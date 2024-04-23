@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Avg
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
@@ -12,7 +11,11 @@ from unidecode import unidecode
 class Course(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    video_url = models.URLField(blank=True)
+    image = models.ImageField(
+        'Изображение',
+        upload_to='static/media/',
+        blank=True,
+        null=True)
     course_slug = models.SlugField(unique=True, max_length=100, default='')
 
 
@@ -81,7 +84,7 @@ class Answer(models.Model):
 
 class LearningProgress(models.Model):
     user = models.ForeignKey('employees.UserProfile', on_delete=models.CASCADE)
-    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     completion_percentage = models.IntegerField(default=0)
     start_date = models.DateTimeField(default=datetime.now)
     end_date = models.DateTimeField(default=datetime.now)
